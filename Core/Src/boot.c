@@ -2,12 +2,15 @@
 #include "fatfs.h"
 #include "usb_host.h"
 
+#define SIZE_DATA 128
+
 FRESULT res;        //FatFs function common result code
 uint32_t bytesread; //File read counts
 uint8_t file_name[] = "bik.bin";
-uint8_t rtext[100];
+uint8_t usb_data[SIZE_DATA];
 
 #define FLASH_DISK_START_ADDRESS ((uint32_t)0x08020000) //אהנוס םאקאכא ןנמדנאללû ADDR_FLASH_SECTOR_1
+#define FLASH_USER_START_ADDR   ADDR_FLASH_SECTOR_1_BANK1      //Start of user Flash area Bank1
 
 //__attribute__((optimize("O0")))
 void GoToUserApp()
@@ -40,18 +43,24 @@ void firmware_write(void) {
     }
     else
     {
-      if(f_open(&USBHFile, (TCHAR const*)file_name, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)  //Create and Open a new text file object with write access
+      if(f_open(&USBHFile, (TCHAR const*)file_name, FA_READ) == FR_OK)  //Create and Open a new text file object with read access
       {
+        uint32_t NbOfSectors = FLASH_SECTOR_5 - FLASH_SECTOR_1 + 1; //Number of sector to erase from 1st sector
 
-        /*for(uint32_t i = 0; i < ALL_LOG_SIZE; i += PAGE_SIZE) {
-          SPI3_ReadData(FLASH_LOGS_ADDR + i, PAGE_SIZE, (uint8_t*)&operative_data);
-          res = f_write(&USBHFile, operative_data, PAGE_SIZE, (void *)&byteswritten); //Write data to the text file 
-        }
-        if((byteswritten > 0) && (res == FR_OK))*/
-        {
-          //res = f_read(&USBHFile, rtext, sizeof(rtext), (void *)&bytesread);//Read data from the text file_name
-          f_close(&USBHFile); //Close the open text file
-        }
+        HAL_FLASH_Unlock();                       //Unlock the Flash to enable the flash control register access
+        FLASH_Erase(FLASH_SECTOR_1, NbOfSectors); //(128 * 5) KB
+
+        static uint32_t addr_flash = FLASH_USER_START_ADDR;
+        while(1) {
+          res = f_read(&USBHFile, usb_data, SIZE_DATA, (void *)&bytesread);//Read data from the text file_name
+          if(bytesread == 0) 
+            break;
+          FLASH_Program(addr_flash, (uint32_t)usb_data, bytesread / 32);
+
+          addr_flash += bytesread;
+        } 
+        HAL_FLASH_Lock(); 
+        f_close(&USBHFile); //Close the open text file
       }
       if (f_mount(NULL, "", 0) != FR_OK)
       {
