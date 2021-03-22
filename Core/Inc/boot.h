@@ -9,6 +9,10 @@ void firmware_write(void);
 void FLASH_Erase(uint32_t, uint32_t);
 void FLASH_Program(uint32_t, uint32_t, uint16_t);
 
+void led_update(void);
+void brightness_IND(uint8_t);
+void LED_TLC59116IR_config(void);
+
 #define FLASH_BASE_ADDR      (uint32_t)(FLASH_BASE)
 #define FLASH_END_ADDR       (uint32_t)(0x081FFFFF)
 

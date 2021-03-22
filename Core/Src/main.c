@@ -29,7 +29,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-__IO uint16_t timer_wait = 3000;
+__IO uint16_t timer_wait = 2500;
 extern ApplicationTypeDef Appli_state;
 /* USER CODE END PTD */
 
@@ -44,6 +44,8 @@ extern ApplicationTypeDef Appli_state;
 
 /* Private variables ---------------------------------------------------------*/
 
+I2C_HandleTypeDef hi2c4;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -51,6 +53,7 @@ extern ApplicationTypeDef Appli_state;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_I2C4_Init(void);
 void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
@@ -92,15 +95,19 @@ int main(void)
   MX_GPIO_Init();
   MX_FATFS_Init();
   MX_USB_HOST_Init();
+  MX_I2C4_Init();
   /* USER CODE BEGIN 2 */
 #endif
 
   MX_GPIO_Init();
+  MX_I2C4_Init();
   //if usb cable isn't connected, jump to main program
   if(USBOH_ID_GPIO_Port->IDR & USBOH_ID_Pin)
     GoToUserApp();
 
   EN_5V_GPIO_Port->BSRR |= EN_5V_Pin;   //USB, Audio, LED, LTDC LED
+  HAL_Delay(5);
+  LED_TLC59116IR_config();
   MX_USB_HOST_Init();
   /* USER CODE END 2 */
 
@@ -184,6 +191,52 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief I2C4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C4_Init(void)
+{
+
+  /* USER CODE BEGIN I2C4_Init 0 */
+
+  /* USER CODE END I2C4_Init 0 */
+
+  /* USER CODE BEGIN I2C4_Init 1 */
+
+  /* USER CODE END I2C4_Init 1 */
+  hi2c4.Instance = I2C4;
+  hi2c4.Init.Timing = 0x10C0ECFF;
+  hi2c4.Init.OwnAddress1 = 0;
+  hi2c4.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c4.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c4.Init.OwnAddress2 = 0;
+  hi2c4.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c4.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c4.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c4, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c4, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C4_Init 2 */
+
+  /* USER CODE END I2C4_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -195,9 +248,9 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(USBOH_PON_GPIO_Port, USBOH_PON_Pin, GPIO_PIN_RESET);

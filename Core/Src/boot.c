@@ -2,7 +2,7 @@
 #include "fatfs.h"
 #include "usb_host.h"
 
-#define SIZE_DATA 128
+#define SIZE_DATA 224 //256-32 bytes
 
 FRESULT res;        //FatFs function common result code
 uint32_t bytesread; //File read counts
@@ -17,6 +17,10 @@ void GoToUserApp()
 {
   uint32_t appJumpAddress;
   void (*GoToApp)(void);  //объявляем пользовательский тип
+
+  //red LEDs turn off
+  brightness_IND(0);
+  led_update();
 
   HAL_RCC_DeInit();
   HAL_DeInit();
@@ -45,21 +49,24 @@ void firmware_write(void) {
     {
       if(f_open(&USBHFile, (TCHAR const*)file_name, FA_READ) == FR_OK)  //Create and Open a new text file object with read access
       {
-        uint32_t NbOfSectors = FLASH_SECTOR_5 - FLASH_SECTOR_1 + 1; //Number of sector to erase from 1st sector
-
-        HAL_FLASH_Unlock();                       //Unlock the Flash to enable the flash control register access
-        FLASH_Erase(FLASH_SECTOR_1, NbOfSectors); //(128 * 5) KB
-
+        FSIZE_t file_size = USBHFile.obj.objsize; // - USBHFile.fptr -- File read/write pointer (Zeroed on file open)
+        uint32_t NbOfSectors = (file_size + 0x1FFFF) / 0x20000;  //0x20000 - 128KB, 0x1FFFF для округления в большую сторону
         static uint32_t addr_flash = FLASH_USER_START_ADDR;
-        while(1) {
-          res = f_read(&USBHFile, usb_data, SIZE_DATA, (void *)&bytesread);//Read data from the text file_name
-          if(bytesread == 0) 
-            break;
-          FLASH_Program(addr_flash, (uint32_t)usb_data, bytesread / 32);
 
-          addr_flash += bytesread;
-        } 
-        HAL_FLASH_Lock(); 
+        if(NbOfSectors > 0 && NbOfSectors < 8) { //size firmwire < 896 Kbytes
+            HAL_FLASH_Unlock();                       //Unlock the Flash to enable the flash control register access
+            FLASH_Erase(FLASH_SECTOR_1, NbOfSectors); //(128 * NbOfSectors) KB
+
+            while(1) {
+              res = f_read(&USBHFile, usb_data, SIZE_DATA, (void *)&bytesread);//Read data from the text file_name
+              if(bytesread == 0) 
+                break;
+              FLASH_Program(addr_flash, (uint32_t)usb_data, (bytesread + 31) / 32);  //program 32 Bytes
+              addr_flash += bytesread;
+            } 
+            HAL_FLASH_Lock();
+        }
+
         f_close(&USBHFile); //Close the open text file
       }
       if (f_mount(NULL, "", 0) != FR_OK)

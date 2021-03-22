@@ -32,22 +32,6 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "config_BIK.h"
-
-#define WIDTH 800
-#define HEIGHT 480
-
-#define SCAN_PERIOD       10
-#define I2C_EXP_PERIOD    25
-#define LED_UPDATE_PERIOD 50
-#define I2C_EEPROM_ADDRESS 0xA0
-#define MEMORY_ADDRESS 0x00
-
-//DMA
-#define DMA_SIZE1 20
-#define DMA_SIZE3 50
-#define NUMB_ADC1_CHANNEL 5
-#define NUMB_ADC3_CHANNEL 1
 
 #define DA7_ADDR   0x6D
 #define DD7_ADDR   0x61
@@ -55,41 +39,6 @@ extern "C" {
 #define DD9_ADDR   0x63
 #define DD10_ADDR  0x64
 #define DD11_ADDR  0x38
-
-#define SB1   0x00000020 //1 << 0x05
-#define SB2   0x00000010
-#define SB3   0x00000008
-#define SB4   0x00000004
-#define SB5   0x00000002
-#define SB6   0x00000001 //1 << 0x00
-#define SB7   0x00002000 //1 << 0x0D
-#define SB8   0x00001000
-#define SB9   0x00000800
-#define SB10  0x00000400
-#define SB11  0x00000200
-#define SB12  0x00000100 //1 << 0x08
-#define SB13  0x00200000 //1 << 0x15
-#define SB14  0x00100000
-#define SB15  0x00080000
-#define SB16  0x00040000
-#define SB17  0x00020000
-#define SB18  0x00010000 //1 << 0x10
-#define SB19  0x20000000 //1 << 0x1D
-#define SB20  0x10000000
-#define SB21  0x08000000
-#define SB22  0x04000000
-#define SB23  0x02000000
-#define SB24  0x01000000 //1 << 0x18
-
-#define MASK_12 0x03
-#define MASK_34 0x0C
-#define MASK_56 0x30
-#define MASK_78 0xC0
-
-#define bit1 0x01
-#define bit3 0x04
-#define bit5 0x10
-#define bit7 0x40
 
 typedef struct __attribute__((packed)) {
   uint8_t reg_address;
