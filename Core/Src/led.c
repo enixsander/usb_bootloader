@@ -15,7 +15,7 @@ tlc59116_control_type dd10 = {0};
 //uint8_t red_light   = 0xFF;
 uint8_t IND_light   = 0xFF;
 
-//IND1 - IND12, Подсветка индикаторов над кнопками - красная 
+//IND1 - IND12, РџРѕРґСЃРІРµС‚РєР° РёРЅРґРёРєР°С‚РѕСЂРѕРІ РЅР°Рґ РєРЅРѕРїРєР°РјРё - РєСЂР°СЃРЅР°СЏ 
 uint8_t *red_leds[12]  = {&dd10.PWM12, &dd10.PWM13, &dd10.PWM14, &dd7.PWM12, &dd7.PWM13, &dd7.PWM14, 
                           &dd9.PWM1,   &dd9.PWM2,   &dd9.PWM3,   &dd8.PWM1,  &dd8.PWM2,  &dd8.PWM3};
 

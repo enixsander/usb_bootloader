@@ -9,14 +9,14 @@ uint32_t bytesread; //File read counts
 uint8_t file_name[] = "bik.bin";
 uint8_t usb_data[SIZE_DATA];
 
-#define FLASH_DISK_START_ADDRESS ((uint32_t)0x08020000) //àäðåñ íà÷àëà ïðîãðàììû ADDR_FLASH_SECTOR_1
+#define FLASH_DISK_START_ADDRESS ((uint32_t)0x08020000) //Ð°Ð´Ñ€ÐµÑ Ð½Ð°Ñ‡Ð°Ð»Ð° Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñ‹ ADDR_FLASH_SECTOR_1
 #define FLASH_USER_START_ADDR   ADDR_FLASH_SECTOR_1_BANK1      //Start of user Flash area Bank1
 
 //__attribute__((optimize("O0")))
 void GoToUserApp()
 {
   uint32_t appJumpAddress;
-  void (*GoToApp)(void);  //îáúÿâëÿåì ïîëüçîâàòåëüñêèé òèï
+  void (*GoToApp)(void);  //Ð¾Ð±ÑŠÑÐ²Ð»ÑÐµÐ¼ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒÑÐºÐ¸Ð¹ Ñ‚Ð¸Ð¿
 
   //red LEDs turn off
   brightness_IND(0);
@@ -26,14 +26,14 @@ void GoToUserApp()
   HAL_DeInit();
   HAL_SuspendTick();
 
-  appJumpAddress = *((volatile uint32_t*)(FLASH_DISK_START_ADDRESS + 4)); //èçâëåêàåì àäðåñ ïåðåõîäà èç âåêòîðà Reset  (PC – ðåãèñòð, êîòîðûé óêàçûâàåò íà òåêóùóþ èíñòðóêöèþ + 4 áàéòà). 
-  GoToApp = (void (*)(void))appJumpAddress; //ïðèâîäèì åãî ê ïîëüçîâàòåëüñêîìó òèïó
+  appJumpAddress = *((volatile uint32_t*)(FLASH_DISK_START_ADDRESS + 4)); //Ð¸Ð·Ð²Ð»ÐµÐºÐ°ÐµÐ¼ Ð°Ð´Ñ€ÐµÑ Ð¿ÐµÑ€ÐµÑ…Ð¾Ð´Ð° Ð¸Ð· Ð²ÐµÐºÑ‚Ð¾Ñ€Ð° Reset  (PC â€“ Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ð¹ ÑƒÐºÐ°Ð·Ñ‹Ð²Ð°ÐµÑ‚ Ð½Ð° Ñ‚ÐµÐºÑƒÑ‰ÑƒÑŽ Ð¸Ð½ÑÑ‚Ñ€ÑƒÐºÑ†Ð¸ÑŽ + 4 Ð±Ð°Ð¹Ñ‚Ð°). 
+  GoToApp = (void (*)(void))appJumpAddress; //Ð¿Ñ€Ð¸Ð²Ð¾Ð´Ð¸Ð¼ ÐµÐ³Ð¾ Ðº Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒÑÐºÐ¾Ð¼Ñƒ Ñ‚Ð¸Ð¿Ñƒ
 
-  //SCB->VTOR = FLASH_DISK_START_ADDRESS; //ïåðåíîñ âåêòîðà ïðåðûâàíèé â îñíîâíîé ïðîãðàììå
-  //óñòàíàâëèâàåì SP ïðèëîæåíèÿ (SP – ðåãèñòð, êîòîðûé óêàçûâàåò íà âåðøèíó ñòåêà
+  //SCB->VTOR = FLASH_DISK_START_ADDRESS; //Ð¿ÐµÑ€ÐµÐ½Ð¾Ñ Ð²ÐµÐºÑ‚Ð¾Ñ€Ð° Ð¿Ñ€ÐµÑ€Ñ‹Ð²Ð°Ð½Ð¸Ð¹ Ð² Ð¾ÑÐ½Ð¾Ð²Ð½Ð¾Ð¹ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ðµ
+  //ÑƒÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°ÐµÐ¼ SP Ð¿Ñ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ñ (SP â€“ Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ð¹ ÑƒÐºÐ°Ð·Ñ‹Ð²Ð°ÐµÑ‚ Ð½Ð° Ð²ÐµÑ€ÑˆÐ¸Ð½Ñƒ ÑÑ‚ÐµÐºÐ°
   __set_MSP(*((__IO uint32_t*) FLASH_DISK_START_ADDRESS)); //stack pointer (to RAM) for USER app in this address  
 
-  GoToApp();  //çàïóñêàåì ïðèëîæåíèå  
+  GoToApp();  //Ð·Ð°Ð¿ÑƒÑÐºÐ°ÐµÐ¼ Ð¿Ñ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ  
 
 }
 
@@ -50,7 +50,7 @@ void firmware_write(void) {
       if(f_open(&USBHFile, (TCHAR const*)file_name, FA_READ) == FR_OK)  //Create and Open a new text file object with read access
       {
         FSIZE_t file_size = USBHFile.obj.objsize; // - USBHFile.fptr -- File read/write pointer (Zeroed on file open)
-        uint32_t NbOfSectors = (file_size + 0x1FFFF) / 0x20000;  //0x20000 - 128KB, 0x1FFFF äëÿ îêðóãëåíèÿ â áîëüøóþ ñòîðîíó
+        uint32_t NbOfSectors = (file_size + 0x1FFFF) / 0x20000;  //0x20000 - 128KB, 0x1FFFF Ð´Ð»Ñ Ð¾ÐºÑ€ÑƒÐ³Ð»ÐµÐ½Ð¸Ñ Ð² Ð±Ð¾Ð»ÑŒÑˆÑƒÑŽ ÑÑ‚Ð¾Ñ€Ð¾Ð½Ñƒ
         static uint32_t addr_flash = FLASH_USER_START_ADDR;
 
         if(NbOfSectors > 0 && NbOfSectors < 8) { //size firmwire < 896 Kbytes
